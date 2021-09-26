@@ -7,8 +7,12 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :j
 app.use(express.json())
 app.use(express.static('build'))
 app.use(cors())
-
+const Note = require('./models/Person')
+const mongoose = require('mongoose')
+const Person = require('./models/Person')
+var password='fullstack'
 // DATA
+
 
 let phone = [
     { 
@@ -37,40 +41,31 @@ let phone = [
 
   
 app.put('/api/persons/:id', (request, response) => {
-    phone = phone.filter(p => p.name !== request.body.name)
+    //phone = phone.filter(p => p.name !== request.body.name)
     const person = {
       name: request.body.name,
       number: request.body.number,
       id: request.body.id
     }
-    phone.push(person)
-    response.send(phone)
+    Person.findByIdAndUpdate(request.params.id, person, {new: true})
+    .then(updatedPerson => {
+      response.json(updatedPerson)
+    })
+    .catch(error=>next(error))
   })
 
 app.post('/api/persons',(request,response)=>{
-      const person = ({
-        id: request.body.id,
+      const person =  new Person({
         name: request.body.name,
         number: request.body.number    
     })
     
-      // CONTROL
-      if(!person.name){
-        response.status(400)
-        return response.json({error: 'need a name'}).end()
-      } 
-      if(!person.number){
-        response.status(400)
-        return response.json ({error: 'need a number'}).end()
-      }
-      if(phone.find(p => p.name === person.name)){
-        response.status(400)
-        return response.json({error: 'need a unique name'}).end()
-      }
-      ///
-    
-        phone.push(person)
-        response.status(204).end()
+    person.save()
+    .then(savedPerson => savedPerson.toJSON())
+    .then(savedAndFormattedPerson => {
+      response.json(savedAndFormattedPerson)
+    }) 
+    .catch(error => next(error))
 })
 
 
@@ -80,9 +75,13 @@ app.post('/api/persons',(request,response)=>{
 app.get('/',(req,res)=>{
     res.send("Hello")
 })
-app.get('/api/persons',(request, response) => {
-    response.json(phone)
-  })
+
+app.get('/api/persons', (request, response) => {
+  Person.find({}).then(result => {
+      response.json(result)
+    })
+})
+
 
 app.get('/info',(request,response)=>{
     let num_phone=phone.length
@@ -90,20 +89,18 @@ app.get('/info',(request,response)=>{
   })
  
 app.get('/api/persons/:id',(request, response) => {
-    const id = Number(request.params.id)
-    const person = phone.find(p => p.id === id)
-    
-    if (person) {
-      response.json(person)
-    } else {
-      response.status(404).end()
-    }
-  })
+    Person.findById(request.params.id).then(per => {
+      if(per){
+        response.json(per)
+      } else {
+        response.status(404).end()
+      }
+  })})
+
 app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    phone = phone.filter(p => p.id !== id)
+  Person.findByIdAndRemove(request.params.id).then(() => {
     response.status(204).end()
-  })
+  })})
 
 
 
