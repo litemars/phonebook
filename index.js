@@ -36,8 +36,24 @@ let phone = [
 //
 
 
+app.delete('/api/phonebook/:id', (request, response) => {
+    Person.findByIdAndRemove(request.params.id).then(() => {
+      response.status(204).end()
+    }).catch(error => next(error))
+    
+  })
+  
+app.put('/api/phonebook/:id', (request, response) => {
+    const body = request.body
+    const person = {
+      name: body.name,
+      number: body.number,
+    }
+    phone=phone.find(p=>p.id!==id)
+    res.send(phone)
+  })
+
 app.post('/api/persons',(request,response)=>{
-      console.log(request.body)
       const person = ({
         id: Math.floor(Math.random() * 100000),
         name: request.body.name,
