@@ -5,8 +5,8 @@ const cors=require('cors')
 morgan.token('json', function (req, res) {  if(req.method==='POST') return JSON.stringify(req.body)})
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :json'))
 app.use(express.json())
-app.use(express.static('build'))
-
+//app.use(express.static('build'))
+app.use(cors())
 
 // DATA
 
@@ -35,30 +35,23 @@ let phone = [
 
 //
 
-
-app.delete('/api/phonebook/:id', (request, response) => {
-    Person.findByIdAndRemove(request.params.id).then(() => {
-      response.status(204).end()
-    }).catch(error => next(error))
-    
-  })
   
-app.put('/api/phonebook/:id', (request, response) => {
-    const body = request.body
+app.put('/api/persons/:id', (request, response) => {
+    phone = phone.filter(p => p.name !== request.body.name)
     const person = {
-      name: body.name,
-      number: body.number,
+      name: request.body.name,
+      number: request.body.number,
+      id: request.body.id
     }
-    phone=phone.find(p=>p.id!==id)
-    res.send(phone)
+    phone.push(person)
+    response.send(phone)
   })
 
 app.post('/api/persons',(request,response)=>{
       const person = ({
-        id: Math.floor(Math.random() * 100000),
+        id: request.body.id,
         name: request.body.name,
-        number: request.body.number
-        
+        number: request.body.number    
     })
     
       // CONTROL
