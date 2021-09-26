@@ -7,10 +7,8 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :j
 app.use(express.json())
 app.use(express.static('build'))
 app.use(cors())
-const Note = require('./models/Person')
-const mongoose = require('mongoose')
 const Person = require('./models/Person')
-var password='fullstack'
+const mongoose = require('mongoose')
 // DATA
 
 
@@ -42,30 +40,30 @@ let phone = [
   
 app.put('/api/persons/:id', (request, response) => {
     //phone = phone.filter(p => p.name !== request.body.name)
+    console.log(request.body)
     const person = {
       name: request.body.name,
-      number: request.body.number,
-      id: request.body.id
+      number: request.body.number
     }
-    Person.findByIdAndUpdate(request.params.id, person, {new: true})
+    Person.findByIdAndUpdate((request.params.id), person, {new: true})
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
-    .catch(error=>next(error))
+    .catch(error=>response.send(error))
   })
 
 app.post('/api/persons',(request,response)=>{
+      console.log(request.body)
       const person =  new Person({
         name: request.body.name,
         number: request.body.number    
     })
     
     person.save()
-    .then(savedPerson => savedPerson.toJSON())
-    .then(savedAndFormattedPerson => {
-      response.json(savedAndFormattedPerson)
+    .then(savedPerson =>  {
+      response.json(savedPerson)
     }) 
-    .catch(error => next(error))
+    .catch(error => response.send(error))
 })
 
 
@@ -85,11 +83,14 @@ app.get('/api/persons', (request, response) => {
 
 app.get('/info',(request,response)=>{
     let num_phone=phone.length
+    console.log("here")
     response.send('<div>Phonebook has info for ' + num_phone + ' people</div><div>' + new Date() + '</div>')
   })
  
 app.get('/api/persons/:id',(request, response) => {
+  console.log("here1")
     Person.findById(request.params.id).then(per => {
+      console.log(per)
       if(per){
         response.json(per)
       } else {
