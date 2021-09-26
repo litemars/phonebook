@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const url = process.env.MONGODB_URI
+const url = "mongodb+srv://fullstack:fullstack@cluster0-ostce.mongodb.net/test?retryWrites=true"
 
 console.log('connecting to', url)
 
