@@ -1,7 +1,8 @@
 const mongoose = require('mongoose')
 var uniqueValidator = require('mongoose-unique-validator')
+require('dotenv').config()
 const url = "mongodb+srv://fullstack:fullstack@cluster0-ostce.mongodb.net/test?retryWrites=true"
-
+//const url = process.env.url
 console.log('connecting to', url)
 
 mongoose.connect(url)
