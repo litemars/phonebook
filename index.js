@@ -8,7 +8,6 @@ app.use(express.json())
 app.use(express.static('build'))
 app.use(cors())
 const Person = require('./models/Person')
-const mongoose = require('mongoose')
 // DATA
 
 
@@ -37,6 +36,20 @@ let phone = [
 
 //
 
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
+
+  next(error)
+}
+app.use(errorHandler)
+
   
 app.put('/api/persons/:id', (request, response) => {
     //phone = phone.filter(p => p.name !== request.body.name)
@@ -49,9 +62,9 @@ app.put('/api/persons/:id', (request, response) => {
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
-    .catch(error=>response.send(error))
+    .catch(error=>next(error))
   })
-
+//works
 app.post('/api/persons',(request,response)=>{
       console.log(request.body)
       const person =  new Person({
@@ -63,30 +76,31 @@ app.post('/api/persons',(request,response)=>{
     .then(savedPerson =>  {
       response.json(savedPerson)
     }) 
-    .catch(error => response.send(error))
+    .catch(error => next(error))
 })
 
 
 
 
-
+//works
 app.get('/',(req,res)=>{
     res.send("Hello")
 })
 
+//works
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(result => {
       response.json(result)
-    })
+    }).catch(error => next(error))
 })
 
-
+//works
 app.get('/info',(request,response)=>{
     let num_phone=phone.length
-    console.log("here")
     response.send('<div>Phonebook has info for ' + num_phone + ' people</div><div>' + new Date() + '</div>')
   })
  
+//Works  
 app.get('/api/persons/:id',(request, response) => {
   console.log("here1")
     Person.findById(request.params.id).then(per => {
@@ -97,11 +111,12 @@ app.get('/api/persons/:id',(request, response) => {
         response.status(404).end()
       }
   })})
-
+//works
 app.delete('/api/persons/:id', (request, response) => {
   Person.findByIdAndRemove(request.params.id).then(() => {
     response.status(204).end()
-  })})
+  }).catch(error => next(error))
+})
 
 
 
