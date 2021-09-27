@@ -51,7 +51,7 @@ const errorHandler = (error, request, response, next) => {
 app.use(errorHandler)
 
   
-app.put('/api/persons/:id', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
     //phone = phone.filter(p => p.name !== request.body.name)
     console.log(request.body)
     const person = {
@@ -65,7 +65,7 @@ app.put('/api/persons/:id', (request, response) => {
     .catch(error=>next(error))
   })
 //works
-app.post('/api/persons',(request,response)=>{
+app.post('/api/persons',(request,response, next)=>{
       console.log(request.body)
       const person =  new Person({
         name: request.body.name,
@@ -90,14 +90,14 @@ app.get('/',(req,res)=>{
 })
 
 //works
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response,next) => {
   Person.find({}).then(result => {
       response.json(result)
     }).catch(error => next(error))
 })
 
 //works
-app.get('/info',(request,response)=>{
+app.get('/info',(request,response,next)=>{
     let num_phone=phone.length
     response.send('<div>Phonebook has info for ' + num_phone + ' people</div><div>' + new Date() + '</div>')
   })
@@ -114,7 +114,7 @@ app.get('/api/persons/:id',(request, response) => {
       }
   })})
 //works
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response,next) => {
   Person.findByIdAndRemove(request.params.id).then(() => {
     response.status(204).end()
   }).catch(error => next(error))
