@@ -61,6 +61,9 @@ app.put('/api/persons/:id', (request, response, next) => {
     })
     .catch(error => next(error))
 })
+app.get('/health', (req, res) => {
+  res.send('ok')
+})
 // works
 app.post('/api/persons', (request, response, next) => {
   console.log(request.body)
